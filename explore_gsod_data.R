@@ -9,7 +9,7 @@
 #        a.tornado_funnel_cloud
 # FROM `bigquery-public-data.noaa_gsod.gsod*` a
 # JOIN `bigquery-public-data.noaa_gsod.stations` b ON a.stn=b.usaf AND a.wban=b.wban
-# WHERE state LIKE "AZ""""
+# WHERE state LIKE "AZ"
 
 
 library(readr)
