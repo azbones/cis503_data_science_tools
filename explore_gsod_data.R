@@ -13,4 +13,11 @@
 
 
 library(readr)
-azgsod <- read_csv("~/your path here/cis503_data_science_tools/data/azgsod.zip")
+azgsod <- read_csv("./data/azgsod.zip")
+
+
+
+azgsod %>% group_by(mo) %>% summarise(count=n(), mean_temp =mean(temp))
+
+
+azgsod %>% group_by(year) %>% summarise(count=n(), mean_temp =mean(temp)) %>% ggplot(aes(x=year, y=mean_temp)) +geom_line()
