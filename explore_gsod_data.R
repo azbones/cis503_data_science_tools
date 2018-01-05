@@ -1,6 +1,6 @@
 # exploring the gsod data for Arizona
 
-# This is the query to pull back the data from Google's BigQuery
+# This is the query to pull back the data from Google's BigQuery (note it is using standard SQL dialect)
 #
 # SELECT b.name, b.country, b.state, b.call, b.lat, b.lon, b.elev, b.begin, b.end, a.wban, 
 #        a.stn, a.year, a.mo, a.da, a.temp, a.count_temp, a.dewp, a.count_dewp, a.stp, a.count_stp, 
