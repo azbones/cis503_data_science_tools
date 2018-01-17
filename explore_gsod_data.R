@@ -55,7 +55,7 @@ arrange(desc())
 
 azgsod %>%
   count(year) %>%
-  print(n=100)
+  print(n=100) 
 
 # RESEARCH QUESTION- has the temperature changed over the duration of the dataset?
 
@@ -89,6 +89,8 @@ azgsod %>%
   ggplot(aes(count_temp)) + geom_histogram()
  
 # focus
+
+
 azgsod %>% 
   filter(name == 'DAVIS-MONTHAN AFB AIRPORT') %>%
   count(year) %>%
@@ -103,7 +105,7 @@ davis %>%
   ggplot(aes(yrmoda, temp)) + geom_point()
 
 davis %>%
-  filter(year == 1980) %>%  # TODO: take out in order to add back in on the fly
+  # filter(year == 1980) %>%  # TODO: take out in order to add back in on the fly
   select(year, mo, da, temp) %>%
   mutate(yrmoda = ISOdatetime(.$year, .$mo, .$da, 0, 0, 0)) %>%
   ggplot(aes(yrmoda, temp)) + geom_line()
@@ -114,24 +116,7 @@ davis %>%
   group_by(year, mo) %>%
   summarise(mean= mean(temp)) -> davis_monthly
 
-library(modelr)
-
-davis_mod <- lm(mean ~ factor(mo), data= davis_monthly)
-
-summary(davis_mod)
-
-# plot model predictions
-
-davis_monthly %>% 
-  add_predictions(davis_mod) %>%
-  ggplot(aes(year + mo/12, pred)) + geom_line()
-
-# plot residuals
-
-davis_monthly %>% 
-  add_residuals(davis_mod) %>%
-  ggplot(aes(year + mo/12, resid)) + geom_point()
-
+# plot some mean temps
 
 davis %>%
   group_by(year) %>%
@@ -144,6 +129,32 @@ davis %>%
   summarise(mean_mo_temp = max(temp)) %>%
   mutate(yrmoda = ISOdatetime(.$year, .$mo, .$da, 0, 0, 0)) %>%
   ggplot(aes(year, mean_mo_temp)) + geom_point() +stat_smooth()
+
+# create a simple linear model
+
+library(modelr)
+
+davis_mod <- lm(mean ~ factor(mo), data= davis_monthly)
+
+summary(davis_mod)
+
+# plot model predictions
+
+
+
+
+davis_monthly %>% 
+  add_predictions(davis_mod) %>%
+  ggplot(aes(year + mo/12, pred)) + geom_line()
+
+# plot residuals
+
+davis_monthly %>% 
+  add_residuals(davis_mod) %>%
+  ggplot(aes(year + mo/12, resid)) + geom_point()
+
+
+
 
 davis$year + davis$mo
 
