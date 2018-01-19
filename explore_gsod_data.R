@@ -5,7 +5,7 @@
 library(readr)
 library(tidyverse)
 
-setwd("~/Documents/My_Documents/ASU/cis 503/cis503_data_science_tools/")
+#setwd("~/Documents/My_Documents/ASU/cis 503/cis503_data_science_tools/")
 azgsod <- read_csv("./data/azgsod.zip")
 View(azgsod)
 
