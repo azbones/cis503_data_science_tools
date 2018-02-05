@@ -2,6 +2,8 @@
 
 # GETTING THE DATA
 
+break # prevents running the whole page
+
 library(readr)
 library(tidyverse)
 
@@ -48,7 +50,8 @@ azgsod %>%
 
 # add print to add more lines to output
 
-# now let's arrange the output by the count in descending order using 
+# now let's arrange the output by the count in descending order from above. Can you figure out how to do this with the code below?
+
 arrange(desc())
 
 # look at observations by year
@@ -59,9 +62,19 @@ azgsod %>%
 
 # RESEARCH QUESTION- has the temperature changed over the duration of the dataset?
 
-# Let's start to visualize the data by looking at temp by year
+# Let's start to visualize the data by looking at temp by year. This will take some time given the dataset is large.
 azgsod %>%
-    ggplot(aes(year, temp)) + geom_point()
+  ggplot(aes(x=year, y=temp)) + 
+  geom_point()
+
+# A better, faster way to plot large datasets is to use geom_boxplot().
+
+azgsod %>%
+  ggplot(aes(x=year, y=temp)) +
+  geom_boxplot()
+
+# Note that the boxplot didn't plot each year which is what I orginally intended. To fix this, use as.factor() to change the year variable to a "factor" datatype.
+
 
 # What kind of data type is year?
 
@@ -69,99 +82,127 @@ azgsod %>%
 # Let's add some datetime types in.
 azgsod %>%
 mutate(yrmoda = ISOdatetime(.$year, .$mo, .$da, 0, 0, 0)) %>%
-  ggplot(aes(yrmoda, temp)) + geom_line()
+  ggplot(aes(yrmoda, temp)) + 
+  geom_line()
 
 # Let's focus the time period to look at the pattern
-
-
 # Instead of looking at all the datapoints, let's group
 
 azgsod %>% 
   group_by(year) %>% 
   summarise(mean_temp =mean(temp)) %>% 
-  ggplot(aes(x=year, y=mean_temp)) + geom_point()
+  ggplot(aes(x=year, y=mean_temp)) + 
+  geom_point()
 
 # Let's look at the number of data points by station
 
 azgsod %>%
   group_by(name) %>%
   summarise(count_temp = n()) %>%
-  ggplot(aes(count_temp)) + geom_histogram()
- 
-# focus
+  ggplot(aes(count_temp)) + 
+  geom_histogram()
 
+# Let's look at the top stations
+
+azgsod %>%
+  group_by(name) %>%
+  summarise(count_temp = n()) %>%
+  arrange(desc(count_temp))
+
+# Now, let's focus the analysis and look at just a single station
+
+# Is it a complete daily dataset?
 
 azgsod %>% 
   filter(name == 'DAVIS-MONTHAN AFB AIRPORT') %>%
   count(year) %>%
   print(n=100)
 
+# Let's add our datetime var and assign our focused data to its own dataframe
+
 azgsod %>% 
-  filter(name == 'DAVIS-MONTHAN AFB AIRPORT') -> davis
+  filter(name == 'DAVIS-MONTHAN AFB AIRPORT') %>%
+  mutate(yrmoda = ISOdatetime(.$year, .$mo, .$da, 0, 0, 0)) -> davis
+
+# Now, let's plot it
 
 davis %>%
   select(year, mo, da, temp) %>%
-  mutate(yrmoda = ISOdatetime(.$year, .$mo, .$da, 0, 0, 0)) %>%
-  ggplot(aes(yrmoda, temp)) + geom_point()
+  ggplot(aes(yrmoda, temp)) + 
+  geom_point()
+
+# How can we change the plot below to see what the pattern looks like in a given year.
 
 davis %>%
-  # filter(year == 1980) %>%  # TODO: take out in order to add back in on the fly
-  select(year, mo, da, temp) %>%
-  mutate(yrmoda = ISOdatetime(.$year, .$mo, .$da, 0, 0, 0)) %>%
-  ggplot(aes(yrmoda, temp)) + geom_line()
+  select(yrmoda, temp) %>%
+  ggplot(aes(yrmoda, temp)) + 
+  geom_line()
 
-
+# Let's look at mean monthly temp data
 
 davis %>%
   group_by(year, mo) %>%
   summarise(mean= mean(temp)) -> davis_monthly
 
-# plot some mean temps
+# plot some max temps
 
 davis %>%
   group_by(year) %>%
-  summarise(mean_mo_temp = max(temp)) %>%
-  ggplot(aes(year, mean_mo_temp)) + geom_point() +stat_smooth()
+  summarise(mean_max_temp = max(temp)) %>%
+  ggplot(aes(year, mean_max_temp)) + 
+  geom_point() 
+
+# Add a trendline to the plot above using stat_smooth()
+
+# Now, let's just look at some specific months like July
 
 davis %>%
-  filter(mo == 7) %>%
+#  filter(?) %>%
   group_by(year,mo) %>%
-  summarise(mean_mo_temp = max(temp)) %>%
-  mutate(yrmoda = ISOdatetime(.$year, .$mo, .$da, 0, 0, 0)) %>%
-  ggplot(aes(year, mean_mo_temp)) + geom_point() +stat_smooth()
+  summarise(mean_max_temp = max(temp)) %>%
+  ggplot(aes(year, mean_max_temp)) + 
+  geom_point() + 
+  stat_smooth()
 
-# create a simple linear model
+# Let's create a simple linear model
 
 library(modelr)
 
-davis_mod <- lm(mean ~ factor(mo), data= davis_monthly)
+davis_mod <- lm(mean ~ as.factor(mo), data= davis_monthly)
 
 summary(davis_mod)
 
 # plot model predictions
 
-
-
-
 davis_monthly %>% 
-  add_predictions(davis_mod) %>%
-  ggplot(aes(year + mo/12, pred)) + geom_line()
+  modelr::add_predictions(davis_mod) %>%
+  ggplot(aes(year + mo/12, pred)) + 
+  geom_line()
 
 # plot residuals
 
 davis_monthly %>% 
-  add_residuals(davis_mod) %>%
-  ggplot(aes(year + mo/12, resid)) + geom_point()
+  modelr::add_residuals(davis_mod) %>%
+  ggplot(aes(year + mo/12, resid)) + 
+  geom_point()
+
+?decompose
+
+# Now let's use an additive seasonal decomposition to look at the trend minus the seasonality
+
+ts_davis_mo = ts(davis_monthly$mean, frequency = 12)
+decompose_davis_mo = decompose(ts_davis_mo, "additive")
 
 
+plot(as.ts(decompose_davis_mo$trend))
+plot(as.ts(decompose_davis_mo$seasonal))
+plot(as.ts(decompose_davis_mo$random))
+plot(decompose_davis_mo)
 
+# As a final example, let's look at how to bring maps into our plots
 
-davis$year + davis$mo
-
-
+install.packages("maps")
 library(maps)
-
-# fun with mapping
 
 # create a base plot to draw on
 p <- ggplot() +
@@ -187,12 +228,3 @@ base_az_map +
   geom_point(data=az_station_locs, aes(x=lon, y=lat), color="dark blue", size=3, alpha=.2)
 
 
-
-
-
-azgsod %>% 
-  group_by(mo) %>% 
-  summarise(count=n(), mean_temp =mean(temp))
-
-
-azgsod %>% group_by(year) %>% summarise(count=n(), mean_temp =mean(temp)) %>% ggplot(aes(x=year, y=mean_temp)) +geom_line()
