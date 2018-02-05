@@ -226,5 +226,3 @@ azgsod %>%
 # add the station locations to the base plot and base Arizona map
 base_az_map +
   geom_point(data=az_station_locs, aes(x=lon, y=lat), color="dark blue", size=3, alpha=.2)
-
-
