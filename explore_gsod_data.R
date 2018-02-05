@@ -73,7 +73,7 @@ azgsod %>%
   ggplot(aes(x=year, y=temp)) +
   geom_boxplot()
 
-# Note that the boxplot didn't plot each year which is what I orginally intended. To fix this, use as.factor() to change the year variable to a "factor" datatype.
+# Note that the boxplot didn't plot each year which is what I originally intended. To fix this, use as.factor() to change the year variable to a "factor" datatype.
 
 
 # What kind of data type is year?
@@ -186,13 +186,12 @@ davis_monthly %>%
   ggplot(aes(year + mo/12, resid)) + 
   geom_point()
 
-?decompose
-
 # Now let's use an additive seasonal decomposition to look at the trend minus the seasonality
 
 ts_davis_mo = ts(davis_monthly$mean, frequency = 12)
 decompose_davis_mo = decompose(ts_davis_mo, "additive")
 
+?decompose
 
 plot(as.ts(decompose_davis_mo$trend))
 plot(as.ts(decompose_davis_mo$seasonal))
