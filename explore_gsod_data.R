@@ -1,13 +1,16 @@
 # example data science workflow
+# print out the cheatsheet to help you- https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf
 
-# GETTING THE DATA
+# NOTE: THERE ARE INTENTIONAL OMMISSIONS IN THE CODE BELOW. YOU WILL HAVE TO FIX THE CODE TO MAKE IT WORK.
+
+# Let's get the data
 
 break # prevents running the whole page
 
-library(readr)
-library(tidyverse)
+library(readr) # This library lets us read CSVs simply
+library(tidyverse) # This library loads a variety of tools we need
 
-#setwd("~/Documents/My_Documents/ASU/cis 503/cis503_data_science_tools/")
+setwd("~/Documents/My_Documents/ASU/cis 503/cis503_data_science_tools/")
 azgsod <- read_csv("./data/azgsod.zip")
 View(azgsod)
 
@@ -50,7 +53,7 @@ azgsod %>%
 
 # add print to add more lines to output
 
-# now let's arrange the output by the count in descending order from above. Can you figure out how to do this with the code below?
+# now let's arrange the output by the count in descending order from above. Can you figure out how to do this with the code below using the desc function?
 
 arrange(desc())
 
@@ -109,46 +112,46 @@ azgsod %>%
   summarise(count_temp = n()) %>%
   arrange(desc(count_temp))
 
-# Now, let's focus the analysis and look at just a single station
+# Now, let's focus the analysis and look at just a single station 'DAVIS-MONTHAN AFB AIRPORT'
 
-# Is it a complete daily dataset?
+# Add the filter parameter below for our target station
 
 azgsod %>% 
-  filter(name == 'DAVIS-MONTHAN AFB AIRPORT') %>%
+  filter(name == ?) %>% # what does the red x to the left of this line number mean?
   count(year) %>%
-  print(n=100)
+  print(n=100) # why is there a red x to the left of this line number?
+
+# What does this output tell us about the data?
+
 
 # Let's add our datetime var and assign our focused data to its own dataframe
 
 azgsod %>% 
-  filter(name == 'DAVIS-MONTHAN AFB AIRPORT') %>%
+  filter(name == ?) %>%
   mutate(yrmoda = ISOdatetime(.$year, .$mo, .$da, 0, 0, 0)) -> davis
+
+# read the code above to describe each action we took on the data
 
 # Now, let's plot it
 
 davis %>%
-  select(year, mo, da, temp) %>%
+  select(?, temp) %>%
   ggplot(aes(yrmoda, temp)) + 
   geom_point()
 
-# How can we change the plot below to see what the pattern looks like in a given year.
-
-davis %>%
-  select(yrmoda, temp) %>%
-  ggplot(aes(yrmoda, temp)) + 
-  geom_line()
+# How can we change the plot above to see what the pattern looks like in a given year.
 
 # Let's look at mean monthly temp data
 
 davis %>%
   group_by(year, mo) %>%
-  summarise(mean= mean(temp)) -> davis_monthly
+  summarise(mean= ?) -> davis_monthly
 
 # plot some max temps
 
 davis %>%
   group_by(year) %>%
-  summarise(mean_max_temp = max(temp)) %>%
+  summarise(mean_max_temp = ?) %>%
   ggplot(aes(year, mean_max_temp)) + 
   geom_point() 
 
@@ -157,7 +160,7 @@ davis %>%
 # Now, let's just look at some specific months like July
 
 davis %>%
-#  filter(?) %>%
+  ? %>%
   group_by(year,mo) %>%
   summarise(mean_max_temp = max(temp)) %>%
   ggplot(aes(year, mean_max_temp)) + 
@@ -166,7 +169,7 @@ davis %>%
 
 # Let's create a simple linear model
 
-library(modelr)
+library(modelr) # this is a simple modeling library
 
 davis_mod <- lm(mean ~ as.factor(mo), data= davis_monthly)
 
@@ -191,7 +194,8 @@ davis_monthly %>%
 ts_davis_mo = ts(davis_monthly$mean, frequency = 12)
 decompose_davis_mo = decompose(ts_davis_mo, "additive")
 
-?decompose
+?ts 
+?decompose # what time period is the code above using to remove seasonality?
 
 plot(as.ts(decompose_davis_mo$trend))
 plot(as.ts(decompose_davis_mo$seasonal))
@@ -201,7 +205,7 @@ plot(decompose_davis_mo)
 # As a final example, let's look at how to bring maps into our plots
 
 install.packages("maps")
-library(maps)
+library(maps) # the maps library to plot geo data
 
 # create a base plot to draw on
 p <- ggplot() +
@@ -225,3 +229,7 @@ azgsod %>%
 # add the station locations to the base plot and base Arizona map
 base_az_map +
   geom_point(data=az_station_locs, aes(x=lon, y=lat), color="dark blue", size=3, alpha=.2)
+
+# What does this plot show you?
+# How might you want to add to it to better understand the data?
+
