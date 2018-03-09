@@ -3,14 +3,17 @@
 
 # NOTE: THERE ARE INTENTIONAL OMMISSIONS IN THE CODE BELOW. YOU WILL HAVE TO FIX THE CODE TO MAKE IT WORK.
 
-# Let's get the data
+# Make sure your R environment has the required libraries. We will need "readr", "tidyverse", "maps", and "modelr".
+# You can install packages using the RStudio UI or with this command: install.packages("package_name")
+
+# Next, let's get the data
 
 break # prevents running the whole page
 
 library(readr) # This library lets us read CSVs simply
 library(tidyverse) # This library loads a variety of tools we need
 
-setwd("~/Documents/My_Documents/ASU/cis 503/cis503_data_science_tools/")
+setwd("directory") # Set you home path here or use the "Files" UI in RStudio
 azgsod <- read_csv("./data/azgsod.zip")
 View(azgsod)
 
@@ -204,7 +207,6 @@ plot(decompose_davis_mo)
 
 # As a final example, let's look at how to bring maps into our plots
 
-install.packages("maps")
 library(maps) # the maps library to plot geo data
 
 # create a base plot to draw on
