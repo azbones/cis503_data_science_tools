@@ -13,7 +13,7 @@ break # prevents running the whole page
 library(readr) # This library lets us read CSVs simply
 library(tidyverse) # This library loads a variety of tools we need
 
-setwd("directory") # Set you home path here or use the "Files" UI in RStudio
+setwd("directory") # Set your home path here or use the "Files" UI in RStudio
 azgsod <- read_csv("./data/azgsod.zip")
 View(azgsod)
 
