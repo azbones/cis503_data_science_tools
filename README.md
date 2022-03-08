@@ -1,6 +1,6 @@
 # CIS 503 Introduction to R and Data Science Tools
 
-This is the repository for the ASU CIS 503 lab for Fall 2019. 
+This is the repository for the ASU CIS 503 optional lab activities. 
 
 The objective of these labs is to allow students to get a hands-on introduction to data science tools and techniques. These labs will  help managers see the actual process and tools data scientists use and provide a jumping off point for those that might want to develop their technical skills further. No programming background is required, but being familiar with scripting will be helpful. 
 
